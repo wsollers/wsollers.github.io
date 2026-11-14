@@ -1,0 +1,73 @@
+name: Publish wsollers.dev
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "404.html"
+      - "CNAME"
+      - ".nojekyll"
+      - "assets/**"
+      - "AdventuresInMath/**"
+      - "appsec-review/**"
+      - "explorer/**"
+      - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out central site
+        uses: actions/checkout@v4
+        with:
+          path: central
+          persist-credentials: false
+      - name: Check out mathematics repository
+        uses: actions/checkout@v4
+        with:
+          repository: wsollers/AdventuresInMathematics
+          ref: main
+          path: math
+          persist-credentials: false
+      - name: Check out application-security repository
+        uses: actions/checkout@v4
+        with:
+          repository: wsollers/appsec-review
+          ref: main
+          path: appsec
+          persist-credentials: false
+      - name: Assemble public site (allowlisted artifacts)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+          cp central/index.html central/404.html central/CNAME central/.nojekyll _site/
+          cp -R central/assets central/AdventuresInMath central/appsec-review central/explorer _site/
+          test -s math/output/pdf/ordered_field_reference.pdf
+          cp math/output/pdf/ordered_field_reference.pdf _site/AdventuresInMath/ordered_field_reference.pdf
+          test -s appsec/review-process.html
+          cp appsec/review-process.html _site/appsec-review/review-process.html
+          test -s _site/index.html
+          test -s _site/assets/css/site.css
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
