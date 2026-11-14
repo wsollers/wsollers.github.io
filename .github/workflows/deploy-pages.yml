@@ -67,6 +67,8 @@ jobs:
           cp math/flashcards/content/ordered-fields/manifest.json math/flashcards/content/ordered-fields/unlock-levels.json math/flashcards/content/ordered-fields/coverage.json math/flashcards/content/ordered-fields/stage-*.json _site/AdventuresInMath/flashcards/decks/ordered-fields/
           test -s _site/AdventuresInMath/flashcards/index.html
           test -s _site/AdventuresInMath/flashcards/decks/ordered-fields/manifest.json
+          # Verify all stage payloads are in the artifact before publishing.
+          node -e 'const fs=require("node:fs");const d="_site/AdventuresInMath/flashcards/decks/ordered-fields";const m=JSON.parse(fs.readFileSync(d+"/manifest.json"));let n=0;for(const s of m.stages){const cards=JSON.parse(fs.readFileSync(d+"/"+s.file));if(cards.length!==s.card_ids.length)throw Error("stage mismatch: "+s.file);n+=cards.length;}if(n!==m.cards.length)throw Error("manifest mismatch");console.log("Publishing "+n+" Foundations flashcards");'
           node --check _site/AdventuresInMath/flashcards/app.mjs
           node --check _site/AdventuresInMath/flashcards/scheduler.mjs
           test -s appsec/review-process.html
