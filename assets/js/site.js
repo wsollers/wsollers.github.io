@@ -1,25 +1,23 @@
-/* Site-wide progressive enhancement: light/dark preference and active navigation. */
+/* Small, site-wide theme preference and footer year. */
 (() => {
   const root = document.documentElement;
-  const key = 'ws-theme';
-  const button = document.querySelector('[data-theme-toggle]');
-  let initial;
-  try { initial = localStorage.getItem(key); } catch { /* storage may be unavailable */ }
-  if (initial === 'light' || initial === 'dark') root.dataset.theme = initial;
-  if (!root.dataset.theme) root.dataset.theme = 'dark';
-  function updateLabel() {
-    if (!button) return;
-    const isDark = root.dataset.theme === 'dark';
-    button.setAttribute('aria-label', `Switch to ${isDark ? 'light' : 'dark'} theme`);
-    button.setAttribute('title', `Switch to ${isDark ? 'light' : 'dark'} theme`);
-    button.textContent = isDark ? '☼' : '◐';
-  }
-  updateLabel();
-  button?.addEventListener('click', () => {
-    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
-    try { localStorage.setItem(key, root.dataset.theme); } catch { /* ignore */ }
-    updateLabel();
+  const key = "ws-theme";
+  const toggle = document.querySelector("[data-theme-toggle]");
+  let stored;
+  try { stored = localStorage.getItem(key); } catch { /* optional storage */ }
+  root.dataset.theme = stored === "dark" ? "dark" : "light";
+  const render = () => {
+    if (!toggle) return;
+    const dark = root.dataset.theme === "dark";
+    toggle.textContent = dark ? "☼" : "◐";
+    toggle.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
+    toggle.setAttribute("title", dark ? "Switch to light mode" : "Switch to dark mode");
+  };
+  render();
+  toggle?.addEventListener("click", () => {
+    root.dataset.theme = root.dataset.theme === "dark" ? "light" : "dark";
+    try { localStorage.setItem(key, root.dataset.theme); } catch { /* optional storage */ }
+    render();
   });
-  const year = document.querySelector('[data-year]');
-  if (year) year.textContent = String(new Date().getFullYear());
+  document.querySelectorAll("[data-year]").forEach(el => {el.textContent = String(new Date().getFullYear());});
 })();
