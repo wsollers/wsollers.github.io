@@ -1,6 +1,6 @@
 # wsollers.dev — central GitHub Pages site
 
-The user Pages repository for **https://wsollers.dev/**. Source is kept in this repository; GitHub Actions assembles and deploys a static artifact on every relevant push to `main`.
+The user Pages repository for **https://wsollers.dev/**. Source is kept in this repository; GitHub Actions assembles and deploys a static artifact on every relevant push to `main`, on manual dispatch, or on the daily artifact refresh.
 
 ## Published paths
 
@@ -8,6 +8,7 @@ The user Pages repository for **https://wsollers.dev/**. Source is kept in this 
 |---|---|
 | `/` | Home, selected projects, public GitHub activity |
 | `/AdventuresInMath/` | Mathematics landing page, ordered-field PDF |
+| `/AdventuresInMath/flashcards/` | Interactive mathematics flashcards and public JSON deck |
 | `/appsec-review/` | AppSec landing page, public review-process graphic |
 | `/explorer/` | Knowledge Explorer introduction and launch link |
 
@@ -27,6 +28,8 @@ The existing `.gitignore` was created from GitHub's Pages template. It is safe w
 `.github/workflows/deploy-pages.yml` runs on pushes to `main`, or can be dispatched manually from **Actions → Publish wsollers.dev**. It checks out the public mathematics and AppSec repositories, then copies **only** these public artifacts into the published tree:
 
 - `AdventuresInMathematics/output/pdf/ordered_field_reference.pdf` → `/AdventuresInMath/ordered_field_reference.pdf`
+- `AdventuresInMathematics/flashcards/web` (selected five runtime files) → `/AdventuresInMath/flashcards/`
+- `AdventuresInMathematics/flashcards/content/ordered-fields` (selected JSON files only) → `/AdventuresInMath/flashcards/decks/ordered-fields/`
 - `appsec-review/review-process.html` → `/appsec-review/review-process.html`
 
 It does **not** publish those repositories wholesale. In particular, AppSec run outputs, targets, evidence, tools, and container configuration remain outside this site.

@@ -13,6 +13,9 @@ on:
       - "explorer/**"
       - ".github/workflows/deploy-pages.yml"
   workflow_dispatch:
+  # Refresh public artifacts from source projects even when this repo has not changed.
+  schedule:
+    - cron: "23 6 * * *"
 
 permissions:
   contents: read
@@ -58,6 +61,14 @@ jobs:
           cp -R central/assets central/AdventuresInMath central/appsec-review central/explorer _site/
           test -s math/output/pdf/ordered_field_reference.pdf
           cp math/output/pdf/ordered_field_reference.pdf _site/AdventuresInMath/ordered_field_reference.pdf
+          # Allowlist exactly the flashcard app and public deck data; never publish review histories.
+          mkdir -p _site/AdventuresInMath/flashcards/decks/ordered-fields
+          cp math/flashcards/web/index.html math/flashcards/web/flashcards.css math/flashcards/web/app.mjs math/flashcards/web/scheduler.mjs math/flashcards/web/sw.js _site/AdventuresInMath/flashcards/
+          cp math/flashcards/content/ordered-fields/manifest.json math/flashcards/content/ordered-fields/unlock-levels.json math/flashcards/content/ordered-fields/coverage.json math/flashcards/content/ordered-fields/stage-*.json _site/AdventuresInMath/flashcards/decks/ordered-fields/
+          test -s _site/AdventuresInMath/flashcards/index.html
+          test -s _site/AdventuresInMath/flashcards/decks/ordered-fields/manifest.json
+          node --check _site/AdventuresInMath/flashcards/app.mjs
+          node --check _site/AdventuresInMath/flashcards/scheduler.mjs
           test -s appsec/review-process.html
           cp appsec/review-process.html _site/appsec-review/review-process.html
           test -s _site/index.html
